@@ -30,68 +30,78 @@ public class Calc {
 
 
     public static String calc(String input) {
-        String[] inputStringArray = input.split(" ");
-        if (inputStringArray.length < 3 ) throw new IllegalArgumentException("cтрока не является математической операцией");
-        if (inputStringArray.length > 3) throw new IllegalArgumentException("формат математической операции не удовлетворяет заданию");
-        List<String> inputStringList = Arrays.asList(inputStringArray);
-        List<String> inputStringListCopy = new ArrayList<>(inputStringList);
-        String operator = inputStringListCopy.get(1);
-        inputStringListCopy.remove(1);
-        List<String> romanNumbers = new ArrayList<>();
-        List<Integer> arabicNumbers = new ArrayList<>();
-        boolean invalidNumber = false;
+        try {
+            input = input.trim();
+            String[] inputStringArray = input.split(" ");
+            if (inputStringArray.length < 3)
+                throw new IllegalArgumentException("cтрока не является математической операцией");
+            if (inputStringArray.length > 3)
+                throw new IllegalArgumentException("формат математической операции не удовлетворяет заданию");
+            List<String> inputStringList = Arrays.asList(inputStringArray);
+            List<String> inputStringListCopy = new ArrayList<>(inputStringList);
+            String operator = inputStringListCopy.get(1);
+            inputStringListCopy.remove(1);
+            List<String> romanNumbers = new ArrayList<>();
+            List<Integer> arabicNumbers = new ArrayList<>();
+            boolean invalidNumber = false;
 
-        for (String i : inputStringListCopy) { // проверка числового формата
-            if (map.containsValue(i)) {
-                romanNumbers.add(i);
-            } else {
-                try {
-                    int arabic = Integer.parseInt(i);
+            for (String i : inputStringListCopy) { // проверка числового формата
+                if (map.containsValue(i)) {
+                    romanNumbers.add(i);
+                } else {
+                    try {
+                        int arabic = Integer.parseInt(i);
 
-                    if (map.containsKey(arabic)) {
-                        arabicNumbers.add(arabic);
+                        if (map.containsKey(arabic)) {
+                            arabicNumbers.add(arabic);
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("задан неверный числовой формат");
                     }
-                } catch (NumberFormatException e) {
-                    System.out.println("задан неверный числовой формат");
                 }
             }
-        }
-        if (romanNumbers.size() != 2 && arabicNumbers.size() !=2 ) throw new IllegalArgumentException("используются одновременно разные системы счисления");
-        isRoman = romanNumbers.size() == 2;
-        isArabic = arabicNumbers.size() == 2;
-        List<Integer> integers = null;
-        if (isRoman) {
-            integers = convertRomanToArabic(romanNumbers);
-        } else if (isArabic) {
-            integers = arabicNumbers;
-        }
+            if (romanNumbers.size() != 2 && arabicNumbers.size() != 2)
+                throw new IllegalArgumentException("используются одновременно разные системы счисления");
+            isRoman = romanNumbers.size() == 2;
+            isArabic = arabicNumbers.size() == 2;
+            List<Integer> integers = null;
+            if (isRoman) {
+                integers = convertRomanToArabic(romanNumbers);
+            } else if (isArabic) {
+                integers = arabicNumbers;
+            }
 
-        int result = 0;
-        switch (operator) {
-            case "+":
-                result = integers.get(0) + integers.get(1);
-                break;
-            case "-":
-                result = integers.get(0) - integers.get(1);
-                break;
-            case "/":
-                result = integers.get(0) / integers.get(1);
-                break;
-            case "*":
-                result = integers.get(0) * integers.get(1);
-                break;
-            default:
-                throw new IllegalArgumentException("неверный оператор");
-        }
-        if (isRoman && result < 1) throw new IllegalArgumentException("в римской системе нет отрицательных чисел");
+            int result = 0;
+            switch (operator) {
+                case "+":
+                    result = integers.get(0) + integers.get(1);
+                    break;
+                case "-":
+                    result = integers.get(0) - integers.get(1);
+                    break;
+                case "/":
+                    result = integers.get(0) / integers.get(1);
+                    break;
+                case "*":
+                    result = integers.get(0) * integers.get(1);
+                    break;
+                default:
+                    throw new IllegalArgumentException("неверный оператор");
+            }
+            if (isRoman && result < 1) throw new IllegalArgumentException("в римской системе нет отрицательных чисел");
 
-        String resultFinal = ""; // возврат результата
-        if (isArabic) {
-            resultFinal = String.valueOf(result);
-        } else if(isRoman) {
-            resultFinal = convertArabicToRoman(result);
+            String resultFinal = ""; // возврат результата
+            if (isArabic) {
+                resultFinal = String.valueOf(result);
+            } else if (isRoman) {
+                resultFinal = convertArabicToRoman(result);
+            }
+            return resultFinal;
+        } catch (IllegalArgumentException e) {
+            return e.getMessage();
+        } catch (Exception e)  {
+            return "Произошла какая-то хуйня: " + e.getMessage();
         }
-        return resultFinal;
 
     }
     private static String convertArabicToRoman(int result) {
